@@ -12,21 +12,35 @@ router.get("/", (req, res) => {
     })
 });
 
-router.post("/:id", (req, res) => {
+router.get("/:id", (req, res) => {
     db("accounts")
     .where({ id: req.params.id})
     .then(account => {
-        (account.length ? res.json(account): PromiseRejectionEvent())
+        (account.length ? res.json(account): reject())
     })
     .catch(err => {
-        res.status(404).json({errorMessage: "Can not create account"})
+        res.status(404).json({errorMessage: "Can not find account"})
     })
 });
 
-router.put("/id", (req, res) => {
+router.post("/", (req, res) => {
+    db("accounts")
+    .insert({ name: req.body.name, budget: req.body.budget })
+    .then(account => {
+        res.json(account)
+    })
+    .catch(err => {
+        res.status(500).json({errorMessage: "Can not create account"})
+    })
+});
+
+router.put("/:id", (req, res) => {
     db("accounts")
     .where({ id: req.params.id })
     .update({ name: req.body.name , budget: req.body.budget })
+    .then( account => {
+        res.json(account)
+    })
     .catch(err => {
         res.status(500).json({ errorMessage: "Can not update account"})
     })
